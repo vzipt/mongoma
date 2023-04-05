@@ -21,10 +21,10 @@ if (platform === 'win32') {
 } else if (platform === 'darwin') {
   if (arch === 'x64') {
     mongodbVersion = 'mongodb-macos-intel';
-    mongodbUrl = 'https://example.com/path/to/mongodb-macos-intel.tar.gz';
+    mongodbUrl = 'https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-6.0.5.tgz';
   } else if (arch === 'arm64') {
     mongodbVersion = 'mongodb-macos-apple';
-    mongodbUrl = 'https://example.com/path/to/mongodb-macos-apple.tar.gz';
+    mongodbUrl = 'https://fastdl.mongodb.org/osx/mongodb-macos-arm64-6.0.5.tgz';
   }
 } else if (platform === 'linux') {
   const distro = getDistro();

@@ -5,6 +5,8 @@ import config from './config.json'
 import {packagePath} from "./utils";
 import spawn from 'cross-spawn';
 import fs from "fs";
+import kill from 'kill-port'
+import detect from 'detect-port'
 
 import chalk from 'chalk';
 
@@ -33,6 +35,12 @@ export default class MongoManager {
   async start() {
     const dbPath = path.join(this.mongoDir, 'data', 'db');
     const logPath = path.join(this.mongoDir, 'data', 'log', 'mongod.log');
+
+    const port = await detect(this.port)
+    if(this.port !== port) {
+      await kill(this.port)
+    }
+
 
     if (!fs.existsSync(dbPath)) {
       fs.mkdirSync(dbPath, { recursive: true });

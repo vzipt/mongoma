@@ -4,6 +4,6 @@ const mongo = new MongoManager()
 
 mongo.start()
 
-setTimeout(()=>{
-mongo.stop()
-}, 2000)
+// setTimeout(()=>{
+// mongo.stop()
+// }, 2000)

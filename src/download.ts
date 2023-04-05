@@ -37,8 +37,11 @@ export async function downloadAndExtractMongoDB(version: string, url: string, ex
 
   if (extension === 'tgz') {
     response.pipe(tar.x({cwd: outputPath}))
-      .on('finish', () => {
+      .on('finish', async () => {
         console.log(`Installed ${version}`);
+        // @ts-ignore
+        config.mongoDir = await displayExtractedFiles(outputPath)
+        fs.writeFileSync(path.join(packagePath, './config.json'), JSON.stringify(config))
       })
       .on('error', (err: Error) => {
         console.error(`Error installing ${version}: ${err}`);
