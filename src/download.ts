@@ -11,7 +11,8 @@ import config from './config.json'
 export async function downloadAndExtractMongoDB(version: string, url: string, extension: string): Promise<void> {
   // @ts-ignore
   const packagePath = path.dirname(require.main.filename);
-  const outputPath = path.join(packagePath, 'mongo');
+  const projectPath = process.cwd();
+  const outputPath = path.join(projectPath, 'mongo');
 
   if (fs.existsSync(outputPath)) {
     console.log(`MongoDB version ${version} already installed.`);
