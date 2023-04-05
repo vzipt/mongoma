@@ -3,15 +3,43 @@ import fs from 'fs';
 import tar from 'tar';
 import unzipper from 'unzipper';
 import ProgressBar from 'progress';
+import findUp from 'find-up';
 import path from 'path';
 import {IncomingMessage} from 'http';
 import {displayExtractedFiles} from "./utils";
+
 import config from './config.json'
+
+
+async function getProjectRoot(): Promise<string> {
+
+  const nodeModulesPath = await findUp('node_modules', { type: 'directory' });
+
+  if (!nodeModulesPath) {
+    throw new Error('Cannot find node_modules directory in the project.');
+  }
+
+  const packageName = 'mongoma';
+  const packagePath = path.join(nodeModulesPath, packageName);
+
+  if (fs.existsSync(packagePath)) {
+    return path.dirname(nodeModulesPath);
+  } else {
+    const workspaceRoot = path.dirname(path.dirname(nodeModulesPath));
+    const packageJsonPath = await findUp('package.json', { cwd: workspaceRoot });
+
+    if (!packageJsonPath) {
+      return process.cwd()
+    }
+
+    return path.dirname(packageJsonPath);
+  }
+}
 
 export async function downloadAndExtractMongoDB(version: string, url: string, extension: string): Promise<void> {
   // @ts-ignore
   const packagePath = path.dirname(require.main.filename);
-  const projectPath = process.cwd();
+  const projectPath = await getProjectRoot();
   const outputPath = path.join(projectPath, 'mongo');
 
   if (fs.existsSync(outputPath)) {
