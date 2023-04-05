@@ -1,16 +1,12 @@
-import {ChildProcess, exec} from 'child_process';
+import {ChildProcess} from 'child_process';
 import path from 'path';
-import {promisify} from 'util';
 import config from './config.json'
-import {packagePath} from "./utils";
 import spawn from 'cross-spawn';
 import fs from "fs";
 import kill from 'kill-port'
 import detect from 'detect-port'
 
 import chalk from 'chalk';
-
-const execAsync = promisify(exec);
 
 export default class MongoManager {
   port = 27017
@@ -84,6 +80,10 @@ export default class MongoManager {
   async stop() {
     this.kill = true
     this.mongoProcess?.kill()
+    const port = await detect(this.port)
+    if(this.port !== port) {
+      await kill(this.port)
+    }
   }
 
   printServerStartInfo(port: number, dbPath: string, logPath: string): void {
