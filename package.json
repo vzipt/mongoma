@@ -1,0 +1,42 @@
+{
+  "name": "mongoma",
+  "version": "0.0.1",
+  "description": "一个本地项目和管理安装 mongodb server 的包",
+  "main": "dist/cjs/index.js",
+  "types": "dist/cjs/index.d.ts",
+  "scripts": {
+    "dev": "father dev",
+    "build": "father build",
+    "build:deps": "father prebundle",
+    "prepublishOnly": "father doctor && npm run build",
+    "postinstall": "node ./dist/cjs/mongo_install.js",
+    "postlink": "pnpm run postinstall"
+  },
+  "keywords": [],
+  "authors": [
+    "ron_dong@163.com"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.2",
+    "@types/node": "^18.15.11",
+    "@types/progress": "^2.0.5",
+    "@types/tar": "^6.1.4",
+    "@types/unzipper": "^0.10.5",
+    "father": "^4.1.7"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cross-spawn": "^7.0.3",
+    "progress": "^2.0.3",
+    "tar": "^6.1.13",
+    "unzipper": "^0.10.11"
+  }
+}
