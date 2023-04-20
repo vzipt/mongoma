@@ -9,38 +9,116 @@ import {IncomingMessage} from 'http';
 import {displayExtractedFiles} from "./utils";
 
 import config from './config.json'
+import * as process from "process";
 
+
+// async function getProjectRoot(): Promise<string> {
+//   const packageName = 'mongoma';
+//   const maxAttempts = 1000;
+//   const delayBetweenAttempts = 1000;
+//
+//   function hasDependency(packageJsonPath: string): boolean {
+//     if (!fs.existsSync(packageJsonPath)) {
+//       return false;
+//     }
+//
+//     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+//     return !!(packageJson.dependencies && packageJson.dependencies[packageName]);
+//   }
+//
+//   function findProjectRoot(startDir: string): string | null {
+//     const packageJsonPath = path.join(startDir, 'package.json');
+//
+//     if (hasDependency(packageJsonPath)) {
+//       return startDir;
+//     }
+//
+//     const subdirs = fs.readdirSync(startDir).filter((subdir) => {
+//       const subdirPath = path.join(startDir, subdir);
+//       return fs.statSync(subdirPath).isDirectory() && subdir !== 'node_modules';
+//     });
+//
+//     for (const subdir of subdirs) {
+//       const subdirPath = path.join(startDir, subdir);
+//       const foundProjectRoot = findProjectRoot(subdirPath);
+//       if (foundProjectRoot) {
+//         return foundProjectRoot;
+//       }
+//     }
+//
+//     return null;
+//   }
+//
+//   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+//     const projectRoot = findProjectRoot(process.cwd());
+//
+//     if (projectRoot) {
+//       return projectRoot;
+//     }
+//
+//     // Wait for a while before the next attempt
+//     await new Promise((resolve) => setTimeout(resolve, delayBetweenAttempts));
+//   }
+//
+//   throw new Error(`Cannot find a package.json with the '${packageName}' dependency after ${maxAttempts} attempts. 3`);
+// }
+
+
+// function getProjectRoot(): string {
+//   const mongomaPath = require.resolve('mongoma');
+//   const nodeModulesPath = mongomaPath.split('/node_modules/')[0] + '/node_modules/';
+//   const projectRoot = path.resolve(nodeModulesPath, '..');
+//
+//   // Check if the subproject's node_modules directory exists
+//   const subprojectNodeModules = path.resolve(projectRoot, 'node_modules');
+//   if (fs.existsSync(subprojectNodeModules)) {
+//     // The subproject's node_modules directory exists, return its project root
+//     return projectRoot;
+//   } else {
+//     // The subproject's node_modules directory does not exist, find the parent project root
+//     const parentProjectRoot = path.resolve(projectRoot, '..');
+//     return parentProjectRoot;
+//   }
+// }
 
 async function getProjectRoot(): Promise<string> {
+  const packageJsonPath = await findUp('package.json', {cwd: path.join(process.cwd(), '..')});
 
-  const nodeModulesPath = await findUp('node_modules', { type: 'directory' });
-
-  if (!nodeModulesPath) {
-    throw new Error('Cannot find node_modules directory in the project.');
-  }
-
-  const packageName = 'mongoma';
-  const packagePath = path.join(nodeModulesPath, packageName);
-
-  if (fs.existsSync(packagePath)) {
-    return path.dirname(nodeModulesPath);
-  } else {
-    const workspaceRoot = path.dirname(path.dirname(nodeModulesPath));
-    const packageJsonPath = await findUp('package.json', { cwd: workspaceRoot });
-
-    if (!packageJsonPath) {
-      return process.cwd()
-    }
-
+  if (packageJsonPath) {
     return path.dirname(packageJsonPath);
   }
+
+
+  if (packageJsonPath === null) {
+    throw new Error('Unable to find the project root.');
+  }
+
+  return ''
+}
+
+async function getMongoServerRoot(): Promise<string> {
+  const projectRoot = await getProjectRoot();
+
+  const configFilePath = path.join(projectRoot, '.mongomarc');
+
+  if (fs.existsSync(configFilePath)) {
+    const configFileContent = fs.readFileSync(configFilePath, 'utf-8');
+    const configFileJSON = JSON.parse(configFileContent);
+
+    if (configFileJSON.mongoServerRoot) {
+      return path.join(projectRoot, configFileJSON.mongoServerRoot);
+    }
+  }
+
+  return projectRoot;
 }
 
 export async function downloadAndExtractMongoDB(version: string, url: string, extension: string): Promise<void> {
   // @ts-ignore
   const packagePath = path.dirname(require.main.filename);
-  const projectPath = await getProjectRoot();
-  const outputPath = path.join(projectPath, 'mongo');
+  // const projectPath = await getProjectRoot();
+  const mongoPath = await getMongoServerRoot();
+  const outputPath = path.join(mongoPath, 'mongo');
 
   if (fs.existsSync(outputPath)) {
     console.log(`MongoDB version ${version} already installed.`);

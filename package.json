@@ -1,6 +1,6 @@
 {
   "name": "mongoma",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha-1",
   "description": "一个本地项目和管理安装 mongodb server 的包",
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.ts",

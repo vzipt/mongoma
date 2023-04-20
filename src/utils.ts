@@ -19,7 +19,7 @@ function getUbuntuVersion(): string | null {
 }
 
 async function displayExtractedFiles(directory: string): Promise<string | null> {
-  return new Promise((res, rej) => {
+  return new Promise((res) => {
     fs.readdir(directory, (err, files) => {
       res(path.join(directory, files[0]) || null)
     })
@@ -27,11 +27,11 @@ async function displayExtractedFiles(directory: string): Promise<string | null> 
 }
 
 // @ts-ignore
-const packagePath = path.dirname(require.main.filename);
+// const packagePath = path.dirname(require.main.filename);
 
 export {
   getDistro,
   getUbuntuVersion,
   displayExtractedFiles,
-  packagePath
+  // packagePath
 };

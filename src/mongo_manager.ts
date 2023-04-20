@@ -7,11 +7,13 @@ import kill from 'kill-port'
 import detect from 'detect-port'
 
 import chalk from 'chalk';
+import {displayExtractedFiles} from "./utils";
 
 export default class MongoManager {
   port = 27017
   mongoDir = config.mongoDir
   mongod = path.join(config.mongoDir, 'bin', 'mongod')
+
 
   mongoProcess: ChildProcess | undefined
 
@@ -22,9 +24,39 @@ export default class MongoManager {
     port: 27017
   }) {
 
+    // (async () => {
+    //   const mongoDir = await displayExtractedFiles(config.mongoDir)
+    //
+    //   if(mongoDir) {
+    //     this.mongod = path.join(mongoDir, 'bin', 'mongod')
+    //   }
+    //
+    //
+    // })()
+
     this.port = options.port
-    console.log(this.mongoDir)
-    console.log(this.mongod)
+  }
+
+  async setup(option: {
+    mongoDir?: string
+  }) {
+    if(option.mongoDir) {
+      const mongoDir = await displayExtractedFiles(option.mongoDir)
+
+      if(mongoDir == null) {
+        throw new Error("Error: setup config mongoDir is not found")
+      }
+
+      this.mongod = path.join(mongoDir, 'bin', 'mongod')
+
+      // @ts-ignore
+      config.mongoDir = mongoDir
+
+      this.mongoDir = mongoDir
+
+      fs.writeFileSync(path.resolve(__dirname, './config.json'), JSON.stringify(config))
+    }
+
   }
 
 
