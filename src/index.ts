@@ -1,1 +1,2 @@
-export { default as MongoManager} from "./mongo_manager";
+import MongoManager from "./mongo_manager";
+export default MongoManager

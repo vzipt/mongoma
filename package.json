@@ -1,6 +1,6 @@
 {
   "name": "mongoma",
-  "version": "0.0.1-alpha-1",
+  "version": "0.0.1-alpha-2",
   "description": "一个本地项目和管理安装 mongodb server 的包",
   "main": "dist/cjs/index.js",
   "types": "dist/cjs/index.d.ts",
@@ -44,5 +44,13 @@
     "progress": "^2.0.3",
     "tar": "^6.1.13",
     "unzipper": "^0.10.11"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:vzipt/mongoma.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vzipt/mongoma/issues"
+  },
+  "homepage": "https://github.com/vzipt/mongoma#readme"
 }
